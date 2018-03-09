@@ -92,7 +92,7 @@ class NewsspiderPipeline(object):
 
 
             """提取关键字并存入oracle"""
-            self.find_new_keyword(sent, dta_date)
+            self.find_new_keyword(sent, "Sina", dta_date)
 
         if isinstance(item, EastItem):
             try:
@@ -103,7 +103,7 @@ class NewsspiderPipeline(object):
                     self.db.update(flag, web, url)
                     """ 提取关键字并存入oracle """
                     sent = self.format_string(item["content"])
-                    self.find_new_keyword(sent, item["datetime"])
+                    self.find_new_keyword(sent, "News", item["datetime"])
             except Exception, e:
                 print e
 
@@ -156,11 +156,11 @@ class NewsspiderPipeline(object):
         return sent
 
 
-    def find_new_keyword(self, sent, dta_date):
+    def find_new_keyword(self, sent, web, dta_date):
         """ 提取关键字并存入oracle """
         tags = self.tags(sentence=sent, topK=None, withWeight=True)
         for k, v in tags:
-            all_sql = self.all_key_sql % (k, "sina", dta_date)
+            all_sql = self.all_key_sql % (k, web, dta_date)
             try:
                 self.ora.cux_sql(self.ora.connect(), all_sql)
             except Exception, e:
