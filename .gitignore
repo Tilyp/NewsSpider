@@ -1,0 +1,8 @@
+*.egg
+*.egg-info
+build
+eggs
+*.pyc
+.idea/
+*.xml
+*.xlsx
