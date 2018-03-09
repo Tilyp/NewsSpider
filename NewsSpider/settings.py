@@ -58,8 +58,8 @@ DOWNLOADER_MIDDLEWARES = {
 }
 
 
-# REDIS_HOST = "10.4.255.129"
-REDIS_HOST = "192.168.20.151"
+# REDIS_HOST = "10.40.255.129"
+REDIS_HOST = "192.168.200.151"
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 #EXTENSIONS = {

@@ -12,9 +12,9 @@ class Dba(object):
         pass
 
     def connect(self):
-        # db = co.connect('system/oracle@192.168.20.216:1521/bigdb')
-        # db = co.connect('system', 'oracle', '192.168.20.216:1521/bigdb')
-        tns = co.makedsn('192.168.20.216', 1521, 'bigdb')
+        # db = co.connect('system/oracle@192.168.200.216:1521/bigdb')
+        # db = co.connect('system', 'oracle', '192.168.200.216:1521/bigdb')
+        tns = co.makedsn('192.168.200.216', 1521, 'bigdb')
         db = co.connect('system', 'oracle', tns)
         return db
 
