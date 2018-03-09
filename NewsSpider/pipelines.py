@@ -134,7 +134,31 @@ class NewsspiderPipeline(object):
                 )
                 self.ora.cux_sql(self.ora.connect(), sql)
             except Exception, e:
-                logger.error("SoGouItem <<%s>>" % e)
+                logger.error("SoGouItem <<%s>>" % e
+			     
+            sent = self.format_string(item["text"])
+            dta_date = item["pushtime"].split(" ")[0]
+            try:
+                item_key = {}
+                for key in self.keys:
+                    num = sent.count(key)
+                    if num != 0:
+                        item_key[key] = num
+                key_tup = zip(item_key.values(), item_key.keys())
+                key_sor = sorted(key_tup, reverse=True)
+                for sor in key_sor[:20]:
+                    old_sql = self.old_key_sql % (
+                        item["id"],
+                        item["url"],
+                        sor[1], sor[0],
+                        item["pushtime"], dta_date
+                    )
+                    self.ora.cux_sql(self.ora.connect(), old_sql)
+            except Exception, e:
+                logger.error("old_sql: <<%s>>" % e)
+
+            """提取关键字并存入oracle"""
+            self.find_new_keyword(sent, "SoGou", dta_date)
 
         if isinstance(item, SinaInformationItem):
             try:
