@@ -15,8 +15,8 @@ class SinaSpider(CrawlSpider):
     def __init__(self, *a, **kw):
         super(SinaSpider, self).__init__(*a, **kw)
         self.rconn = RedisSet().redisSet()
-        self.words = self.load_keyword()
         self.path = "/data1/crawler/andycrawler/NewsSpider/weatheroutput/weatheroutput/"
+        self.words = self.load_keyword()
         self.wm = WeatherModel(
             self.path + "LinearSVCl2.model",  self.path + "vectorizer.data",
             self.path + "ch2.data", self.path + "keywords.txt"
