@@ -50,7 +50,7 @@ class QxjSpider (CrawlSpider):
         except:
             title = "Null"
         if title != "Null":
-            data = response.meta
+            data = response.meta["data"]
             htmlParse = data["htmlParse"]
             try:
                 try:
@@ -83,7 +83,7 @@ class QxjSpider (CrawlSpider):
             except Exception, e:
                 lines = "Null"
             item = EastItem()
-            msg = response.meta["msg"]
+            msg = data["msg"]
             item["web"] = msg[0]
             item["url"] = msg[1]
             item["datetime"] = msg[1]
