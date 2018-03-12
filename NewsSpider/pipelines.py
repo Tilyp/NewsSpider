@@ -31,8 +31,8 @@ class NewsspiderPipeline(object):
         self.tweets = db["Tweets"]
         self.Info = db["Information"]
         self.ora = Dba()
+	self.path = "/data1/crawler/andycrawler/NewsSpider/weatheroutput/weatheroutput/"
         self.keys = self.load_key()
-        self.path = "/data1/crawler/andycrawler/NewsSpider/weatheroutput/weatheroutput/"
         self.wm = WeatherModel(
             self.path + "LinearSVCl2.model",  self.path + "vectorizer.data",
             self.path + "ch2.data", self.path + "keywords.txt")
