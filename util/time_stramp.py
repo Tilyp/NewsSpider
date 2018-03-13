@@ -17,7 +17,7 @@ class Time_stamp(object):
         s = time.mktime(time.strptime(dt, self.format))
         return int(s)
 
-    def flag_time(self, string):
+    def flag_time(self, string, limitTime):
         if type(string) != int:
             d1 = self.datetime_timestamp(string)
             strTime = string
@@ -28,7 +28,7 @@ class Time_stamp(object):
         d2 = self.datetime_timestamp(current_time)
         hours = (d2 - d1) / 3600
         flag = 0
-        if hours > 24*2:
+        if hours > 24*limitTime:
             flag += 2
             #elif hours <24*0:
             #    flag += 3
@@ -37,12 +37,12 @@ class Time_stamp(object):
         return strTime, flag
     
     
-    def time_handle(self, string):
+    def time_handle(self, string, limitTime):
         current_time = time.strftime(self.format, time.localtime(time.time()))
         now_time = datetime.datetime.now()
         flag = 0
         if type(string) == int:
-            return self.flag_time(string)
+            return self.flag_time(string, limitTime)
         num_list = re.findall("\d+", string)
         if u"今天" in string:
             strTime = current_time.split(" ")[0] + " " + string.split(" ")[1] + ":00"
@@ -55,14 +55,14 @@ class Time_stamp(object):
             else:
                 strTime = "2017-" + num_list[0] + "-" + num_list[1] + " " + \
                           num_list[2] + ":" + num_list[3] + ":00"
-            return self.flag_time(strTime)
+            return self.flag_time(strTime, limitTime)
         elif u"分" in string:
             stamp = now_time - datetime.timedelta(seconds=int(num_list[0]) * 60)
             strTime = stamp.strftime(self.format)
             flag += 1
             return strTime, flag
         else:
-            return self.flag_time(string)
+            return self.flag_time(string, limitTime)
 
 
     def time_stamp(self, string):
