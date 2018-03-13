@@ -12,8 +12,8 @@ from util.time_stramp import Time_stamp
 class SinaSpider(CrawlSpider):
     name = "SinaSpider"
     rootUrl = "https://weibo.cn"
-    def __init__(self, *a, **kw):
-        super(SinaSpider, self).__init__(*a, **kw)
+    def __init__(self, limitTime):
+        self.limitTime = limitTime
         self.rconn = RedisSet().redisSet()
         self.path = "/data1/crawler/andycrawler/NewsSpider/weatheroutput/weatheroutput/"
         self.words = self.load_keyword()
@@ -21,8 +21,19 @@ class SinaSpider(CrawlSpider):
             self.path + "LinearSVCl2.model",  self.path + "vectorizer.data",
             self.path + "ch2.data", self.path + "keywords.txt"
         )
+        super(SinaSpider, self).__init__(self.name)
 
+    @classmethod
+    def from_settings(cls, settings):
+        return cls(settings.get('LIMIT_TIME'))
 
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = SinaSpider.from_settings(crawler.settings)
+        spider._set_crawler(crawler)
+        return spider
+
+    
     def start_requests(self):
         url = "https://weibo.cn/%s"
         le = 1
@@ -43,7 +54,7 @@ class SinaSpider(CrawlSpider):
         flag_list = []
         for i in soup.find_all("div", class_="c")[1:-2]:
             strTime = i.find("span", class_="ct").get_text(strip=True).split(u" 来自")[0]
-            pushTime, flag = Time_stamp().time_handle(strTime)
+            pushTime, flag = Time_stamp().time_handle(strTime, self.limitTime)
             flag_list.append(flag)
             if flag == 1:
                 content_id = i["id"].strip("M_")
