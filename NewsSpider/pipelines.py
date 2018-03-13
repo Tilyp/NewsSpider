@@ -100,7 +100,7 @@ class NewsspiderPipeline(object):
                 if flag == 1:
                     url = item["url"]
                     web = item["web"]
-                    self.db.update(flag, web, url)
+                    self.ora.update(flag, web, url)
                     """ 提取关键字并存入oracle """
                     sent = self.format_string(item["content"])
                     self.find_new_keyword(sent, "News", item["datetime"])
