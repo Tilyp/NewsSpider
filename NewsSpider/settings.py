@@ -21,6 +21,9 @@ NEWSPIDER_MODULE = 'NewsSpider.spiders'
 # Obey robots.txt rules
 # ROBOTSTXT_OBEY = True
 
+# 设置要爬取的天数限制
+LIMIT_TIME = 1
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
