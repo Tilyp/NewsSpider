@@ -16,7 +16,7 @@ class QxjSpider (CrawlSpider):
     name = "QxjSpider"
 
     def __init__(self, *a, **kw):
-        super(QxjSpider, self).__init__(*a, **kw)
+
         self.rconn = RedisSet().redisSet()
         self.dba = Dba()
         self.keyword = {"新浪网": "Sina", "环球网": "Huanqiu", "搜狐网": "Sohu", "网易": "WangYi",
@@ -26,13 +26,11 @@ class QxjSpider (CrawlSpider):
                         "上海新闻网": "ShangHaiNews",  "腾讯大申网": "Tencent", "宽带山": "KuanDai",
                         "中国广播网": "Radio"}
         self.current_date = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        super(QxjSpider, self).__init__(*a, **kw)
 
 
     def start_requests(self):
-        # for i in self.db.query(self.current_date):
-        lists = self.dba.query("2018-2-24")
-        self.dba.close()
-        # print len(lists)
+        lists = self.dba.query(self.current_date)
         for i in lists:
             try:
                 htmlParse = self.parse_list()[self.keyword[i[0]]]
@@ -41,16 +39,15 @@ class QxjSpider (CrawlSpider):
             except Exception, e:
                 logger.error("No definition of parsing rules for <<%s>> web" % e)
 
-                    
 
     def parse(self, response):
         soup = BeautifulSoup(response.body, "lxml")
+        data = response.meta["data"]
         try:
             title = soup.find("title").get_text(strip=True)
         except:
             title = "Null"
-        if title != "Null":
-            data = response.meta["data"]
+        if title != "Null" or data["msg"][0] == "腾讯大申网":
             htmlParse = data["htmlParse"]
             try:
                 try:
@@ -66,50 +63,46 @@ class QxjSpider (CrawlSpider):
                     description = soup.find('meta', {"name": "Description"})['content']
             except :
                 description = "Null"
-            try:
+            lines = ""
+            for parse in htmlParse:
                 try:
-                    try:
-                        zw = soup.find(htmlParse[0][0], {htmlParse[0][1]: htmlParse[0][2]}).get_text(strip=True)
-                    except:
-                        zw = soup.find(htmlParse[1][0], {htmlParse[1][1]: htmlParse[1][2]}).get_text(strip=True)
-                except:
-                    zw = soup.find(htmlParse[2][0], {htmlParse[2][1]: htmlParse[2][2]}).get_text(strip=True)
-                # 去掉特殊字符
-                xx = u"([\u4e00-\u9fff]+)"
-                zws = re.findall(xx, zw)
-                lines = ""
-                for line in zws:
-                    lines += line
-            except Exception, e:
-                lines = "Null"
-            item = EastItem()
-            msg = data["msg"]
-            item["web"] = msg[0]
-            item["url"] = msg[1]
-            item["datetime"] = msg[1]
-            item['title'] = title
-            item['keywords'] = keywords
-            item['description'] = description
-            item['content'] = lines
-            yield item
+                    zw = soup.find(parse[0], {parse[1]: parse[2]}).get_text(strip=True)
+                    xx = u"([\u4e00-\u9fff]+)"
+                    zws = re.findall(xx, zw)
+                    for line in zws:
+                        lines += line
+                    break
+                except Exception, e:
+                    pass
 
-
+            if len(lines) > 5:
+                item = EastItem()
+                msg = data["msg"]
+                item["web"] = msg[0]
+                item["url"] = msg[1]
+                item["datetime"] = msg[1]
+                item['title'] = title
+                item['keywords'] = keywords
+                item['description'] = description
+                item['content'] = lines
+                yield item
 
     def parse_list(self):
         # 定义解析规则
-        htmlParse = {"Sina": [["div", "id", "artibody"]],
+        htmlParse = {"Sina": [["div", "id", "artibody"], ["div", "id", "article"]],
                      "Huanqiu": [["div", "class", "text"], ["article", "class", "text"]],
                      "Liba": [["div", "class", "ui-topic-content fn-break", ], ["div", "class", "clearfix"]],
                      "Sohu": [["article", "class", "article"], ["div", "id", "main_content"]],
-                     "Ifeng": [["div", "id", "artical_real"], ["div", "id", "picTxt"]],
+                     "Ifeng": [["div", "id", "artical_real"], ["div", "id", "picTxt"], ["div", "id", "yc_con_txt"]],
                      "Online": [["div", "class", "newsCon"], ["div", "id", "zoom"]],
-                     "Tencent": [["div", "id", "contTxt"], ["div", "class", "article"], ["div", "id", "Cnt-Main-Article-QQ"]],
+                     "Tencent": [["div", "id", "Cnt-Main-Article-QQ"], ["div", "id", "contTxt"], ["div", "class", "article"], ],
                      "KanKan": [["div", "class", "textBody"]],
-                     "WangYi": [["div", "class", "post_text"], ["div", "class", "viewport"]],
-                     "Eastday": [["div", "id", "zw"], ["div", "class", "main"]],
-                     "Xinhua": [["div", "id", "p-detail"], ["div", "class", "article"], ["div", "id", "content"]],
+                     "WangYi": [["div", "class", "post_text"], ["div", "class", "viewport"], ["div", "id", "endText"]],
+                     "Eastday": [["div", "id", "zw"], ["div", "class", "main"], ["div", "class", "zw"],
+                                 ["div", "class", "article-content"], ["div", "class", "newsContent"]],
+                     "Xinhua": [["div", "id", "p-detail"], ["div", "id", "article"], ["div", "id", "content"]],
                      "People": [["div", "class", "box_con"], ["div", "class", "clearfix"]],
-                     "Xinmin": [["div", "class", "a_p"], ["article", "class", "padding15 content"]],
+                     "Xinmin": [["div", "class", "a_p"], ["article", "class", "padding15 content"],["div", "id", "MP_article"]],
                      "Weather": [["div", "class", "xyn-text"]],
                      "ShangGuan": [["div", "id", "newscontents"]],
                      "ShangHaiNews": [["div", "class", "cms-news-article-content-block"]],
