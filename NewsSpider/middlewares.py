@@ -19,7 +19,7 @@ class CookiesMiddleware(RetryMiddleware):
     def __init__(self, settings, crawler):
         RetryMiddleware.__init__(self, settings)
         self.rconn = settings.get("RCONN", redis.Redis(crawler.settings.get('REDIS_HOST', 'localhost'), crawler.settings.get('REDIS_PORT', 6379), 2))
-        if crawler.spider.name != "SoGouSpider":
+        if crawler.spider.name not in ["SoGouSpider", "QxjSpider"]:
             # 由于微博的cookie是以spider.name管理的，这里为了统一，就都使用“SinaSpider”
             name = "SinaSpider"
             # name = crawler.spider.name
