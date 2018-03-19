@@ -30,7 +30,7 @@ class CookiesMiddleware(RetryMiddleware):
         return cls(crawler.settings, crawler)
 
     def process_request(self, request, spider):
-        if spider.name != "SoGouSpider":
+        if spider.name not in ["SoGouSpider", "QxjSpider"]:
             redisKeys = self.rconn.keys()
             while len(redisKeys) > 0:
                 elem = random.choice(redisKeys)
