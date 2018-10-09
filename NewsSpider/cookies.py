@@ -1,8 +1,5 @@
 # encoding=utf-8
 # ------------------------------------------
-#   版本：3.0
-#   日期：2016-12-01
-#   作者：九茶<http://blog.csdn.net/bone_ace>
 # ------------------------------------------
 import os
 import json
@@ -21,7 +18,7 @@ import numpy as np
 from images import images
 
 
-IDENTIFY = 1  # 验证码输入方式:
+IDENTIFY = 1 
 dcap = dict(DesiredCapabilities.PHANTOMJS)  # PhantomJS需要使用老版手机的user-agent，不然验证码会无法通过
 dcap["phantomjs.page.settings.userAgent"] = (
     "Mozilla/5.0 (Linux; U; Android 2.3.6; en-us; Nexus S Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
